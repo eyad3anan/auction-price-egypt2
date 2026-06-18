@@ -5,6 +5,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="Egyptian Auction Price Predictor",
     description="""
@@ -46,6 +48,18 @@ The interval is calibrated from the ensemble's test-set RMSLE (0.2655).
 | `verified_seller` | int | Whether seller is verified | 0 or 1 |
     """,
     version="1.1.0"
+)
+
+origins = [
+    "http://localhost:3000", 
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -180,5 +194,5 @@ def predict(listing: AuctionListing):
             price_range_low_egp=result["price_range_low"],
             price_range_high_egp=result["price_range_high"],
         )
-    except Exception as e:
+    except Exception as     e:
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
